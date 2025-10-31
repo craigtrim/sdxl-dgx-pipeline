@@ -39,18 +39,18 @@ Run SDXL in a Docker container, generate prompts with a local Ollama model, and 
 
 1. Docker with NVIDIA runtime on the Sparx unit
 2. Ollama running locally:
-   '''
+   ```
    ollama pull llama2-uncensored
-   '''
+   ```
    or
-   '''
+   ```
    ollama run llama2-uncensored
-   '''
+   ```
 3. A host directory for outputs, for example:
-   '''
+   ```
    /home/sdxl
    └── prompts
-   '''
+   ```
 
 Update paths in the scripts if using a different directory.
 
@@ -67,27 +67,27 @@ Adjust to:
 ## Build and run
 
 From the project directory:
-'''
+```shell
 ./build-and-run-sdxl.sh "generate HMS Surprise sailing around Cape Horn in 1815"
-'''
+```
 
 This performs:
 
 1. Build:
-   '''
+   ```shell
    sudo docker build -t sdxl:local .
-   '''
+   ```
 2. Prompt generation:
-   '''
+   ```shell
    python /home/<user>/projects/sdxl/sdxl_prompt_builder.py \
      --idea "<your idea>" \
      --out /home/<user>/sdxl/prompts/tmp.txt
-   '''
+   ```
 3. MD5 naming:
    - prompt → `/home/<user>/sdxl/prompts/<md5>.txt`
    - image → `/home/<user>/sdxl/<md5>.png`
 4. Container run with recommended flags:
-   '''
+   ```shell
    sudo docker run -it --gpus all \
      --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
      -v /home/<user>/sdxl:/workspace/data \
@@ -95,7 +95,7 @@ This performs:
      /workspace/generate-image.sh \
        --prompt-file /workspace/data/prompts/<md5>.txt \
        --output /workspace/data/<md5>.png
-   '''
+   ```
 
 Because of the bind mount, the PNG is written directly to the host directory.
 
@@ -107,21 +107,21 @@ Because of the bind mount, the PNG is written directly to the host directory.
   - `sdxl_from_file.py`
   - `generate-image.sh`
 - Keep the runtime flags for GB10:
-  '''
+  ```shell
   --ipc=host --ulimit memlock=-1 --ulimit stack=67108864
-  '''
+  ```
 
 ## Variants
 
 Generate the prompt only:
-'''
+```shell
 python sdxl_prompt_builder.py \
   --idea "dieselpunk airship" \
   --out /home/<user>/sdxl/prompts/test.txt
-'''
+```
 
 Use an existing prompt:
-'''
+```shell
 sudo docker run -it --gpus all \
   --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
   -v /home/<user>/sdxl:/workspace/data \
@@ -129,4 +129,4 @@ sudo docker run -it --gpus all \
   /workspace/generate-image.sh \
     --prompt-file /workspace/data/prompts/test.txt \
     --output /workspace/data/test.png
-'''
+```
