@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
-from diffusers import StableDiffusionXLPipeline
+
+
+
 import torch
 import argparse
 from pathlib import Path
+from diffusers import StableDiffusionXLPipeline
+
+
+MAX_TOKENS = 75  # SDXL/CLIP usually 77; reserve a couple
 
 
 def read_prompt(path: str) -> str:
@@ -15,14 +21,23 @@ def read_prompt(path: str) -> str:
     return txt
 
 
+def truncate_prompt(prompt: str, max_tokens: int = MAX_TOKENS) -> str:
+    # simple whitespace tokenization is good enough here
+    parts = prompt.split()
+    if len(parts) <= max_tokens:
+        return prompt
+    return " ".join(parts[:max_tokens])
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="SDXL image generator (prompt in file)")
+    parser = argparse.ArgumentParser(description="SDXL image generator (prompt in file, length-safe)")
     parser.add_argument("--prompt-file", default="prompt.txt")
     parser.add_argument("--output", default="out.png")
     parser.add_argument("--steps", type=int, default=30)
     args = parser.parse_args()
 
-    prompt = read_prompt(args.prompt_file)
+    prompt_raw = read_prompt(args.prompt_file)
+    prompt = truncate_prompt(prompt_raw, MAX_TOKENS)
 
     pipe = StableDiffusionXLPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0",
@@ -40,7 +55,9 @@ def main() -> None:
     ).images[0]
 
     image.save(args.output)
-    print(f"✅ wrote {args.output} from {args.prompt_file}")
+    print(f"✅ wrote {args.output}")
+    if prompt != prompt_raw:
+        print(f"⚠️ prompt truncated to {MAX_TOKENS} tokens")
 
 
 if __name__ == "__main__":

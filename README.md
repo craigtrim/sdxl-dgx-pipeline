@@ -57,7 +57,7 @@ Update paths in the scripts if using a different directory.
 ## Directory convention
 
 Default in the scripts:
-- host data dir: `/home/craigtrim/sdxl`
+- host data dir: `~/projects/sdxl`
 - container mount: `/workspace/data`
 
 Adjust to:
